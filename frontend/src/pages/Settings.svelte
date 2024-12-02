@@ -16,7 +16,7 @@
 
         EventsOn("saved_as", (file: string) => {
             Swal.fire({
-                title: `Saved as: ${file}`,
+                title: `${$_("saved_as")} ${file}`,
                 width: 275,
                 icon: "success",
                 iconHtml: `
@@ -37,7 +37,7 @@
 
         EventsOn("enter_password", async () => {
             const { value: password } = await Swal.fire({
-                title: "Enter the master password that was used when you made the backup.",
+                title: `${$_("enter_password")}`,
                 width: 275,
                 input: "password",
                 icon: "question",
@@ -62,34 +62,41 @@
         });
 
         EventsOn("imported_data", (res: string) => {
+            // console.log(res);
             if (res === "success") {
                 GetLanguage().then((result) => {
                     locale.set(result);
                     EventsEmit("change_title", `${$_("app_title")}`);
-                });
-                // console.log(res);
-                Swal.fire({
-                    title: "Data imported successfully !!",
-                    width: 275,
-                    icon: "success",
-                    iconHtml: `
-                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" viewBox="0 0 16 16">
-                    <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
-                    </svg>
-                    `,
-                    background: "#1D232A",
-                    color: "#A6ADBA",
-                    confirmButtonColor: "#3085d6",
-                    customClass: {
-                        title: "successTitle",
-                        confirmButton: "alertConfirm",
-                        icon: "alertIcon",
-                    },
+
+                    Swal.fire({
+                        title: `${$_("import_successful")}`,
+                        width: 275,
+                        icon: "success",
+                        iconHtml: `
+                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+                        </svg>
+                        `,
+                        background: "#1D232A",
+                        color: "#A6ADBA",
+                        confirmButtonColor: "#3085d6",
+                        customClass: {
+                            title: "successTitle",
+                            confirmButton: "alertConfirm",
+                            icon: "alertIcon",
+                        },
+                    });
                 });
             } else {
-                // console.log(res);
+                // `${res.replace(/^.{1}/g, res[0].toUpperCase())} !!`
+                if (res.includes("cannot")) {
+                    res = `${$_("backup_error")}`;
+                } else {
+                    res = `${$_("invalid_password")}`;
+                }
+
                 Swal.fire({
-                    title: `${res.replace(/^.{1}/g, res[0].toUpperCase())} !!`,
+                    title: `${res}`,
                     width: 275,
                     icon: "error",
                     iconHtml: `
@@ -120,7 +127,7 @@
 
     const showAlert = () =>
         Swal.fire({
-            title: `Are you sure you want to remove all saved passwords?"`,
+            title: `${$_("alert_delete_all")}`,
             width: 275,
             icon: "warning",
             iconHtml: `
@@ -133,7 +140,7 @@
             showCancelButton: true,
             confirmButtonColor: "#3085d6",
             cancelButtonColor: "#d33",
-            confirmButtonText: "Yes, delete it!",
+            confirmButtonText: `${$_("alert_confirm_deleting")}`,
             customClass: {
                 title: "alertTitle",
                 confirmButton: "alertConfirm",
@@ -144,7 +151,7 @@
             if (result.value) {
                 Drop().then(() => push("/"));
                 Swal.fire({
-                    title: "All password entries have been removed !!",
+                    title: `${$_("alert_delete_confirm_msg")}`,
                     width: 275,
                     icon: "success",
                     iconHtml: `

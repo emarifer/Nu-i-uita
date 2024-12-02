@@ -6,6 +6,7 @@
         DeleteEntry,
     } from "../../wailsjs/go/main/App";
     import { onDestroy, onMount } from "svelte";
+    import { _ } from "svelte-i18n";
     import Swal from "sweetalert2";
     import { push } from "svelte-spa-router";
 
@@ -39,7 +40,7 @@
 
     const showAlert = (website: string, id: string) =>
         Swal.fire({
-            title: `Deleting password for "${website}."`,
+            title: `${$_("alert_deleting_password")} "${website}."`,
             width: 275,
             icon: "warning",
             iconHtml: `
@@ -52,7 +53,7 @@
             showCancelButton: true,
             confirmButtonColor: "#3085d6",
             cancelButtonColor: "#d33",
-            confirmButtonText: "Yes, delete it!",
+            confirmButtonText: `${$_("alert_confirm_deleting")}`,
             customClass: {
                 title: "alertTitle",
                 confirmButton: "alertConfirm",
@@ -63,7 +64,7 @@
             if (result.value) {
                 DeleteEntry(id).then(() => deleteItem(id));
                 Swal.fire({
-                    title: "The task has been deleted.",
+                    title: `${$_("deletion_confirm_msg")}`,
                     width: 275,
                     icon: "success",
                     iconHtml: `
@@ -83,12 +84,12 @@
             }
         });
 
-    function deleteItem(id: string) {
+    const deleteItem = (id: string): void => {
         let itemIdx = entries.findIndex((x) => x.Id === id);
         entries.splice(itemIdx, 1);
         entries = entries;
         GetPasswordCount().then((result) => (listCounter = result));
-    }
+    };
 </script>
 
 {#if search}
@@ -96,7 +97,7 @@
 {/if}
 {#if entries.length}
     <ul
-        class="w-full m-auto max-h-40 overflow-y-auto flex flex-col gap-2 bg-slate-800 rounded-lg p-2 ml-2 mr-4"
+        class="w-full m-auto max-h-40 overflow-y-auto flex flex-col gap-2 bg-slate-800 rounded-lg p-2 ml-2 mr-4 overflow-x-hidden"
     >
         {#each entries as entry (entry.Id)}
             <li
@@ -109,9 +110,9 @@
                 >
                     {entry.Website}
                 </p>
-                <div class="flex gap-1 w-fit">
+                <div class="flex gap-1 w-fit mr-2">
                     <button
-                        data-tip="Details"
+                        data-tip={$_("details_btn_tip")}
                         class="btn btn-ghost btn-sm tooltip tooltip-top"
                         aria-label="Details"
                         onclick={() => push(`/details/${entry.Id}`)}
@@ -141,7 +142,7 @@
                         </svg>
                     </button>
                     <button
-                        data-tip="Delete"
+                        data-tip={$_("delete_btn_tip")}
                         class="btn btn-ghost btn-sm tooltip tooltip-top"
                         aria-label="Delete Item"
                         onclick={() => showAlert(entry.Website, entry.Id)}

@@ -29,15 +29,13 @@
             <p class="text-xs text-slate-600 font-medium">{$_("more_info")}</p>
             <a
                 onclick={() =>
-                    BrowserOpenURL(
-                        "https://github.com/emarifer/go-wails-svelte-desktop-todoapp",
-                    )}
+                    BrowserOpenURL("https://github.com/emarifer/Nu-i-uita")}
                 class="text-xs font-medium hover:text-sky-500 ease-in duration-300 -m-4"
                 href="http://"
                 target="_blank"
                 rel="noopener noreferrer"
             >
-                https://github.com/emarifer/go-wails-svelte-desktop-todoapp
+                https://github.com/emarifer/Nu-i-uita
             </a>
         </div>
 

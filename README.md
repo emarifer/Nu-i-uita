@@ -3,7 +3,7 @@
 # Nu-i uita
 
 <p style="margin-bottom: 16px;">
-    Minimalist password manager desktop app made with Golang - Wails & Svelte
+    Minimalist password manager desktop app made with Golang-Wails & Svelte
 </p>
 
 <img src="doc/zorro.png" width="47%">

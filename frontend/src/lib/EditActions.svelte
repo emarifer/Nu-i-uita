@@ -1,5 +1,6 @@
 <script lang="ts">
     import Swal from "sweetalert2";
+    import { _ } from "svelte-i18n";
     import { DeleteEntry } from "../../wailsjs/go/main/App";
     import type { models } from "../../wailsjs/go/models";
     import { push } from "svelte-spa-router";
@@ -8,7 +9,7 @@
 
     const showAlert = (website: string, id: string) =>
         Swal.fire({
-            title: `Deleting password for "${website}."`,
+            title: `${$_("alert_deleting_password")} "${website}."`,
             width: 275,
             icon: "warning",
             iconHtml: `
@@ -21,7 +22,7 @@
             showCancelButton: true,
             confirmButtonColor: "#3085d6",
             cancelButtonColor: "#d33",
-            confirmButtonText: "Yes, delete it!",
+            confirmButtonText: `${$_("alert_confirm_deleting")}"`,
             customClass: {
                 title: "alertTitle",
                 confirmButton: "alertConfirm",
@@ -37,7 +38,7 @@
 
 <div class="flex gap-2 absolute bottom-2 right-6">
     <button
-        data-tip="Edit"
+        data-tip={$_("edit_btn_tip")}
         class="btn btn-ghost btn-sm tooltip tooltip-top"
         aria-label="Edit Item"
         onclick={() => push(`/edit/${entry.Id}`)}
@@ -55,7 +56,7 @@
     </button>
 
     <button
-        data-tip="Delete"
+        data-tip={$_("delete_btn_tip")}
         class="btn btn-ghost btn-sm tooltip tooltip-top"
         aria-label="Delete Item"
         onclick={() => showAlert(entry.Website, entry.Id)}

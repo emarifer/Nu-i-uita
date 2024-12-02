@@ -1,6 +1,7 @@
 <script lang="ts">
     import { onMount } from "svelte";
     import { fade, fly } from "svelte/transition";
+    import { _ } from "svelte-i18n";
     import BackBtn from "../lib/BackBtn.svelte";
     import ShowPasswordBtn from "../lib/ShowPasswordBtn.svelte";
     import { GetEntryById, UpdateEntry } from "../../wailsjs/go/main/App";
@@ -45,7 +46,7 @@
             username.trim() === "" ||
             password.trim() === ""
         ) {
-            toast = "None of the fields can be empty !!";
+            toast = `${$_("no_empty_fields")}`;
             visible = true;
 
             tmId1 = setTimeout(() => {
@@ -57,7 +58,7 @@
             password = entry.Password;
             return;
         } else if (password.trim().length < 6) {
-            toast = "Password must be at least 6 characters long !!";
+            toast = `${$_("password_too_short")}`;
             visible = true;
 
             tmId2 = setTimeout(() => {
@@ -89,7 +90,7 @@
     >
         <div class="flex flex-col gap-3 w-full m-auto pl-6 pr-10">
             <label for="website" class="text-lg font-light mx-auto">
-                Edit Entry Password
+                {$_("edit_title")}
             </label>
             <input
                 class="input input-bordered input-primary input-sm w-full bg-slate-800"
@@ -97,7 +98,7 @@
                 bind:value={website}
                 id="website"
                 type="text"
-                placeholder="Website"
+                placeholder={$_("website_placeholder")}
             />
             <input
                 class="input input-bordered input-primary input-sm w-full bg-slate-800"
@@ -105,7 +106,7 @@
                 bind:value={username}
                 id="username"
                 type="text"
-                placeholder="Username"
+                placeholder={$_("username_placeholder")}
             />
             <div class="relative">
                 <input
@@ -114,7 +115,7 @@
                     bind:value={password}
                     id="website"
                     type={show ? "text" : "password"}
-                    placeholder="Password"
+                    placeholder={$_("password_placeholder")}
                 />
                 <ShowPasswordBtn bind:showPass={show} />
             </div>
@@ -136,7 +137,7 @@
                             d="M3 16h10v-5.5a.5.5 0 0 0-.5-.5h-9a.5.5 0 0 0-.5.5zm9-16H4v5.5a.5.5 0 0 0 .5.5h7a.5.5 0 0 0 .5-.5zM9 1h2v4H9z"
                         />
                     </svg>
-                    Update Entry
+                    {$_("update_btn")}
                 </button>
                 {#if visible}
                     <p

@@ -1,6 +1,7 @@
 <script lang="ts">
     import { onMount } from "svelte";
     import { fade, fly } from "svelte/transition";
+    import { _ } from "svelte-i18n";
     import { copy } from "svelte-copy";
     import BackBtn from "../lib/BackBtn.svelte";
     import ShowPasswordBtn from "../lib/ShowPasswordBtn.svelte";
@@ -26,7 +27,7 @@
     });
 
     const onCopy = (element: string) => {
-        toast = `${element} copied to clipboard.`;
+        toast = `${element} ${$_("copied_msg")}`;
         visible = true;
         tmId = setTimeout(() => {
             toast = "";
@@ -44,12 +45,14 @@
         <div
             class="w-full m-auto flex flex-col gap-2 bg-slate-800 rounded-lg p-2 ml-2 mr-6 relative"
         >
-            <h1 class="text-xl font-light m-auto mb-6">Password Details</h1>
+            <h1 class="text-xl font-light m-auto mb-6">
+                {$_("details_title")}
+            </h1>
             <p class="text-start">{entry.Website}</p>
             <div class="flex gap-2">
                 <p class="text-start flex-1">{entry.Username}</p>
                 <button
-                    data-tip="Copy"
+                    data-tip={$_("copy_tip")}
                     class="btn btn-ghost btn-sm tooltip tooltip-top"
                     aria-label="Copy"
                     use:copy={`${entry.Username}`}
@@ -80,7 +83,7 @@
                     <ShowPasswordBtn bind:showPass={show} />
                 </div>
                 <button
-                    data-tip="Copy"
+                    data-tip={$_("copy_tip")}
                     class="btn btn-ghost btn-sm tooltip tooltip-top"
                     aria-label="Copy"
                     use:copy={`${entry.Password}`}
