@@ -1,0 +1,7 @@
+build/bin
+frontend/node_modules
+frontend/dist
+
+nuiuita_db
+
+*.nuitabak

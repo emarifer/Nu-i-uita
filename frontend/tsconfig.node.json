@@ -1,0 +1,15 @@
+{
+    "compilerOptions": {
+        "composite": true,
+        "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
+        "skipLibCheck": true,
+        "module": "ESNext",
+        "moduleResolution": "Bundler",
+        "strict": true,
+        "noEmit": false /*, changed to 'false' & remove the following key to avoid error
+        "noUncheckedSideEffectImports": true */
+    },
+    "include": [
+        "vite.config.ts"
+    ]
+}

@@ -1,0 +1,66 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+    text-align: center;
+}
+
+body {
+    margin: 0;
+    font-family: "Nunito", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
+    "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
+}
+
+@font-face {
+    font-family: "Nunito";
+    font-style: normal;
+    font-weight: 400;
+    src: local(""),
+    url("assets/fonts/nunito-v16-latin-regular.woff2") format("woff2");
+}
+
+#app {
+    height: 100vh;
+    text-align: center;
+}
+
+.alertTitle {
+    font-size: 0.8rem;
+    font-weight: normal;
+}
+
+.successTitle {
+    font-size: 0.8rem;
+    font-weight: normal;
+    color: #84CC16;
+}
+
+.errorTitle {
+    font-size: 0.8rem;
+    font-weight: normal;
+    color: #EA580C;
+}
+
+.alertConfirm {
+    font-size: 11px;
+    height: 1.6rem;
+}
+
+.alertCancel {
+    font-size: 11px;
+    height: 1.6rem;
+}
+
+.alertIcon {
+    width: 2rem;
+    height: 2rem;
+    border-width: 1px;
+}
+
+.inputDialog {
+    font-size: 10px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+}
