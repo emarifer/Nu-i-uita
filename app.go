@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"os"
 
 	"github.com/emarifer/Nu-i-uita/internal/db"
 	"github.com/emarifer/Nu-i-uita/internal/models"
@@ -145,13 +144,4 @@ func (a *App) DeleteEntry(id string) {
 
 func (a *App) Drop() {
 	a.db.DropCollections()
-}
-
-func (a *App) GetRepositoryTag() string {
-	v, isTag := os.LookupEnv("VERSION")
-	if !isTag || v == "" {
-		return "v.1.0.0"
-	}
-
-	return v
 }

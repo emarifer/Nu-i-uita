@@ -3,16 +3,12 @@
     import { fade, fly } from "svelte/transition";
     import { _ } from "svelte-i18n";
     import { BrowserOpenURL } from "../../wailsjs/runtime/runtime";
-    import { GetRepositoryTag } from "../../wailsjs/go/main/App";
     import BackBtn from "../lib/BackBtn.svelte";
 
     let mounted: boolean = false;
     let version: string = "";
 
-    onMount(() => {
-        mounted = true;
-        GetRepositoryTag().then((result) => (version = result));
-    });
+    onMount(() => (mounted = true));
 </script>
 
 {#if mounted}
@@ -40,7 +36,7 @@
         </div>
 
         <span class="text-xs font-bold text-sky-600 absolute bottom-4 right-4">
-            {$_("version")}&nbsp;{version}
+            {$_("version")}&nbsp;DEV_VERSION
         </span>
 
         <BackBtn />

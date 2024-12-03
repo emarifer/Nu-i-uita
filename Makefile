@@ -6,7 +6,9 @@ default:
 	# Run "create-bundles" to generate the bundles
 
 create-bundles:
+	sh scripts/toggle_version.sh -u
 	wails build -clean -upx
 	wails build -skipbindings -s -platform windows/amd64 -upx
 	sh scripts/packaging-linux.sh 'Nu-i uita' nuiuita
 	sh scripts/packaging-windows.sh nuiuita
+	sh scripts/toggle_version.sh -r

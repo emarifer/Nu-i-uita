@@ -20,8 +20,6 @@ export function GetMasterPassword():Promise<boolean>;
 
 export function GetPasswordCount():Promise<number>;
 
-export function GetRepositoryTag():Promise<string>;
-
 export function SaveLanguage(arg1:string):Promise<void>;
 
 export function SaveMasterPassword(arg1:string):Promise<string>;

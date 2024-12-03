@@ -38,10 +38,6 @@ export function GetPasswordCount() {
   return window['go']['main']['App']['GetPasswordCount']();
 }
 
-export function GetRepositoryTag() {
-  return window['go']['main']['App']['GetRepositoryTag']();
-}
-
 export function SaveLanguage(arg1) {
   return window['go']['main']['App']['SaveLanguage'](arg1);
 }
