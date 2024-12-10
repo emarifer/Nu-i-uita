@@ -4,11 +4,8 @@ import (
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/rand"
-	"errors"
+	"encoding/base64"
 	"fmt"
-	"io"
-
-	b64 "encoding/base64"
 )
 
 type Crypto struct {
@@ -27,11 +24,11 @@ func (c Crypto) encryptB64(content string) (string, error) {
 		return "", err
 	}
 
-	return c.B64Encode(res), nil
+	return c.b64Encode(res), nil
 }
 
 func (c Crypto) decryptB64(content string) (string, error) {
-	res, err := c.B64Decode(content)
+	res, err := c.b64Decode(content)
 	if err != nil {
 		return "", err
 	}
@@ -50,69 +47,103 @@ func (c Crypto) decrypt(content string) (string, error) {
 	return decrypt([]byte(content), c.key)
 }
 
-func (c Crypto) B64Decode(content string) (string, error) {
-	res, err := b64.StdEncoding.DecodeString(content)
+func (c Crypto) b64Decode(content string) (string, error) {
+	res, err := base64.StdEncoding.DecodeString(content)
 
 	return string(res), err
 }
 
-func (c Crypto) B64Encode(content string) string {
+func (c Crypto) b64Encode(content string) string {
 
-	return b64.StdEncoding.EncodeToString([]byte(content))
+	return base64.StdEncoding.EncodeToString([]byte(content))
 }
+
+/*
+// Verifies that a string contains only ASCII characters (single byte):
+// https://stackoverflow.com/questions/53069040/checking-a-string-contains-only-ascii-characters
+func isASCII(s string) bool {
+	for i := 0; i < len(s); i++ {
+		if s[i] > unicode.MaxASCII {
+			return false
+		}
+	}
+
+	return true
+}
+*/
 
 func keyfy(password string) []byte {
 	// this is to pad the password to make it 32
 	password = fmt.Sprintf("%032s", password)
-	// This is to avoid the problem that would arise
-	// if characters of more than one byte were used.
-	runes := []rune(password)
 
 	key := ""
 	for i := 0; i < 32; i++ {
-		key += string(runes[i])
+		key += string(password[i])
 	}
 
 	return []byte(key)
 }
 
 func encrypt(plaintext string, key []byte) ([]byte, error) {
-	text := []byte(plaintext)
-	c, err := aes.NewCipher(key)
+	aes, err := aes.NewCipher(key)
 	if err != nil {
 		return nil, err
 	}
 
-	gcm, err := cipher.NewGCM(c)
+	gcm, err := cipher.NewGCM(aes)
 	if err != nil {
 		return nil, err
 	}
 
+	// We need a 12-byte nonce for GCM (modifiable if you use cipher.NewGCMWithNonceSize())
+	// A nonce should always be randomly generated for every encryption.
 	nonce := make([]byte, gcm.NonceSize())
-	if _, err = io.ReadFull(rand.Reader, nonce); err != nil {
+	_, err = rand.Read(nonce)
+	// https://cs.opensource.google/go/go/+/refs/tags/go1.23.4:src/crypto/rand/rand.go;l=26
+	if err != nil {
 		return nil, err
 	}
 
-	return gcm.Seal(nonce, nonce, text, nil), nil
+	// ciphertext here is actually nonce+ciphertext
+	// So that when we decrypt, just knowing the nonce size
+	// is enough to separate it from the ciphertext.
+	ciphertext := gcm.Seal(nonce, nonce, []byte(plaintext), nil)
+
+	return ciphertext, nil
 }
 
 func decrypt(ciphertext []byte, key []byte) (string, error) {
-	c, err := aes.NewCipher(key)
+	aes, err := aes.NewCipher(key)
 	if err != nil {
 		return "", err
 	}
 
-	gcm, err := cipher.NewGCM(c)
+	gcm, err := cipher.NewGCM(aes)
 	if err != nil {
 		return "", err
 	}
 
+	// Since we know the ciphertext is actually nonce+ciphertext
+	// And len(nonce) == NonceSize(). We can separate the two.
+	// Therefore, we are sure that len(ciphertext) < nonceSize
+	// will never be true.
 	nonceSize := gcm.NonceSize()
-	if len(ciphertext) < nonceSize {
-		return "", errors.New("ciphertext too short")
+	nonce, ciphertext := ciphertext[:nonceSize], ciphertext[nonceSize:]
+
+	plaintext, err := gcm.Open(nil, nonce, ciphertext, nil)
+	if err != nil {
+		return "", err
 	}
 
-	nonce, ciphertext := ciphertext[:nonceSize], ciphertext[nonceSize:]
-	bytes, err := gcm.Open(nil, nonce, ciphertext, nil)
-	return string(bytes), err
+	return string(plaintext), nil
 }
+
+/* REFERENCES:
+https://dev.to/breda/secret-key-encryption-with-go-using-aes-316d
+https://www.geeksforgeeks.org/io-readfull-function-in-golang-with-examples/
+https://blog.logrocket.com/learn-golang-encryption-decryption/
+https://www.twilio.com/en-us/blog/encrypt-and-decrypt-data-in-go-with-aes-256
+https://bruinsslot.jp/post/golang-crypto/
+
+https://www.google.com/search?q=golang+password+encryption+and+decryption&oq=golang+password+encryption+and+decryption&gs_lcrp=EgZjaHJvbWUqBggAEEUYOzIGCAAQRRg7MgYIARBFGEAyCggCEAAYgAQYogQyCggDEAAYgAQYogQyCggEEAAYgAQYogQyCggFEAAYgAQYogTSAQgxODI5ajBqN6gCCLACAQ&sourceid=chrome&ie=UTF-8
+*/

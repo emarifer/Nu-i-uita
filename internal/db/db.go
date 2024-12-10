@@ -31,7 +31,7 @@ type Db struct {
 
 type DbDump struct {
 	Mp           string
-	Pwds         []models.PasswordEntryDto
+	Pwds         []models.PasswordEntry
 	LanguageCode string
 }
 
@@ -95,8 +95,6 @@ func (db *Db) InsertMasterPassword(mpStr string) string {
 	if err != nil {
 		panic(err)
 	}
-	// mp.Id = id
-	// return mp, nil
 
 	return id
 }
@@ -129,9 +127,8 @@ func (db *Db) GetCryptoInstance() *models.Crypto {
 }
 
 func (db *Db) InsertPasswordEntry(password models.PasswordEntry) string {
-	crypto := db.GetCryptoInstance()
-
-	passDto := password.DTO(crypto)
+	// encrypts the password using the current master password as key
+	passDto := password.EncryptPassEntry(db.GetCryptoInstance())
 
 	doc := d.NewDocumentOf(passDto)
 	id, err := db.clover.InsertOne(password_entry_collection, doc)
@@ -176,11 +173,10 @@ func (db *Db) FilterPasswords(search string) []models.PasswordEntry {
 */
 
 func (db *Db) GetPasswordById(id string) models.PasswordEntry {
-	crypto := db.GetCryptoInstance()
 	doc, _ := db.clover.FindById(password_entry_collection, id)
 	dto := loadPasswordEntryDto(doc)
 
-	return dto.ToPasswordEntry(crypto)
+	return dto.DecryptPassEntry(db.GetCryptoInstance())
 }
 
 func (db *Db) loadManyPasswordEntry(docs []*d.Document) []models.PasswordEntry {
@@ -188,22 +184,22 @@ func (db *Db) loadManyPasswordEntry(docs []*d.Document) []models.PasswordEntry {
 	result := make([]models.PasswordEntry, len(docs))
 	for i, doc := range docs {
 		dto := loadPasswordEntryDto(doc)
-		result[i] = dto.ToPasswordEntry(crypto)
+		result[i] = dto.DecryptPassEntry(crypto)
 	}
 
 	return result
 }
 
-func loadPasswordEntryDto(doc *d.Document) *models.PasswordEntryDto {
-	var dto models.PasswordEntryDto
+func loadPasswordEntryDto(doc *d.Document) *models.PasswordEntry {
+	var dto models.PasswordEntry
 	doc.Unmarshal(&dto)
 	dto.Id = doc.ObjectId()
 
 	return &dto
 }
 
-func loadManyPasswordEntryDto(docs []*d.Document) []models.PasswordEntryDto {
-	result := make([]models.PasswordEntryDto, len(docs))
+func loadManyPasswordEntryDto(docs []*d.Document) []models.PasswordEntry {
+	result := make([]models.PasswordEntry, len(docs))
 	for i, doc := range docs {
 		result[i] = *loadPasswordEntryDto(doc)
 	}
@@ -216,9 +212,9 @@ func (db *Db) DeletePasswordEntry(id string) {
 }
 
 func (db *Db) UpdatePasswordEntry(pe models.PasswordEntry) bool {
-	dto := pe.DTO(db.GetCryptoInstance())
-	updates := dto.ToMap()
-	// doc := d.NewDocumentOf(dto)
+	passDto := pe.EncryptPassEntry(db.GetCryptoInstance())
+	updates := passDto.ToMap()
+
 	// creating the query when the Id field (whose default name is "_id")
 	// has the value of the todo that we pass to it
 	q := query.
@@ -285,12 +281,10 @@ func (db *Db) ImportDump(password string, dumpFileLocation string) error {
 	if !mp.Check(password) {
 		return errors.New("invalid dump password")
 	}
-
-	newMp := models.NewMasterPassword(password)
-	cryptoImport := newMp.GetCrypto()
+	cryptoImport := mp.GetCrypto()
 
 	for _, dto := range importedDump.Pwds {
-		pe := dto.ToPasswordEntry(&cryptoImport)
+		pe := dto.DecryptPassEntry(&cryptoImport)
 		db.InsertPasswordEntry(pe)
 	}
 

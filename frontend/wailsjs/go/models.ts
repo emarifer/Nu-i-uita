@@ -4,6 +4,7 @@ export namespace models {
 	    Id: string;
 	    Website: string;
 	    Username: string;
+	    Timestamp: number;
 	    Password: string;
 	
 	    static createFrom(source: any = {}) {
@@ -15,6 +16,7 @@ export namespace models {
 	        this.Id = source["Id"];
 	        this.Website = source["Website"];
 	        this.Username = source["Username"];
+	        this.Timestamp = source["Timestamp"];
 	        this.Password = source["Password"];
 	    }
 	}

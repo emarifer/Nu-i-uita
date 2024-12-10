@@ -42,8 +42,8 @@
     });
 
     const onLogin = () => {
-        if (newPassword.length < 6) {
-            toast = $_("password_too_short");
+        if (newPassword.length < 6 || !isAscii(newPassword)) {
+            toast = $_("password_too_short_or_non_ascii_chars");
             visible = true;
             tmId1 = setTimeout(() => {
                 toast = "";
@@ -75,6 +75,8 @@
             }
         });
     };
+
+    const isAscii = (str: string): boolean => /^[\x00-\x7F]+$/.test(str);
 </script>
 
 {#if mounted}
@@ -136,4 +138,7 @@
 
     Cleanup timeout:
     https://stackoverflow.com/questions/64862161/svelte-store-function-update
+
+    CHECK ASCII CHARACTERS:
+    https://quickref.me/check-if-a-string-contains-only-ascii-characters.html
  -->

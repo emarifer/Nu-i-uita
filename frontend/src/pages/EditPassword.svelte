@@ -57,8 +57,8 @@
             username = entry.Username;
             password = entry.Password;
             return;
-        } else if (password.trim().length < 6) {
-            toast = `${$_("password_too_short")}`;
+        } else if (password.trim().length < 6 || !isAscii(password)) {
+            toast = `${$_("password_too_short_or_non_ascii_chars")}`;
             visible = true;
 
             tmId2 = setTimeout(() => {
@@ -80,6 +80,8 @@
             result ? push("/home") : false;
         });
     };
+
+    const isAscii = (str: string): boolean => /^[\x00-\x7F]+$/.test(str);
 </script>
 
 {#if mounted}

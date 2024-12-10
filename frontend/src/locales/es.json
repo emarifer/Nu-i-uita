@@ -5,7 +5,7 @@
     "generate": "Generar",
     "insert": "Insertar",
     "login": "Inciar sesión",
-    "password_too_short": "¡La contraseña debe tener al menos 6 caracteres!",
+    "password_too_short_or_non_ascii_chars": "¡La contraseña debe tener al menos 6 caracteres o contener únicamente caracteres ASCII!",
     "wrong_password": "¡Contraseña incorrecta!",
     "show_password": "Mostrar contraseña",
     "hide_password": "Ocultar contraseña",
