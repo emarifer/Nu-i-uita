@@ -3,6 +3,7 @@ package models
 type MasterPassword struct {
 	id    string
 	Value string `clover:"value"`
+	clear string
 }
 
 func NewMasterPasswordFromB64(value string) MasterPassword {
@@ -10,6 +11,7 @@ func NewMasterPasswordFromB64(value string) MasterPassword {
 	return MasterPassword{
 		"",
 		value,
+		"",
 	}
 }
 
@@ -20,15 +22,25 @@ func NewMasterPassword(value string) MasterPassword {
 	return MasterPassword{
 		"",
 		v,
+		"",
 	}
 }
 
 func (m *MasterPassword) GetCrypto() Crypto {
 
-	return newCrypto(m.Value)
+	return newCrypto(m.clear)
 }
 
-func (m *MasterPassword) Check(value string) bool {
+func (m *MasterPassword) SetClear(clear string) {
+	m.clear = clear
+}
+
+/* func (m *MasterPassword) GetClear() string {
+
+	return m.clear
+} */
+
+func (m *MasterPassword) Check(value string, cb func(v string)) bool {
 	c := newCrypto(value)
 
 	v, err := c.decryptB64(m.Value)
@@ -36,5 +48,10 @@ func (m *MasterPassword) Check(value string) bool {
 		return false
 	}
 
-	return v == value
+	if v == value {
+		cb(value)
+		return true
+	}
+
+	return false
 }

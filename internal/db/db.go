@@ -35,6 +35,8 @@ type DbDump struct {
 	LanguageCode string
 }
 
+var clear string
+
 func setupCollections(db *c.DB) {
 	db.CreateCollection(language_collection)
 	db.CreateCollection(master_password_collection)
@@ -89,6 +91,7 @@ func (db *Db) SaveLanguageCode(code string) {
 }
 
 func (db *Db) InsertMasterPassword(mpStr string) string {
+	clear = mpStr
 	mp := models.NewMasterPassword(mpStr)
 	doc := d.NewDocumentOf(mp)
 	id, err := db.clover.InsertOne(master_password_collection, doc)
@@ -119,9 +122,15 @@ func (db *Db) RecoverMasterPassword() models.MasterPassword {
 	return mp
 }
 
+func (db *Db) SetMasterPassword(v string) {
+	clear = v
+}
+
 func (db *Db) GetCryptoInstance() *models.Crypto {
 	mp := db.RecoverMasterPassword()
+	mp.SetClear(clear)
 	instance := mp.GetCrypto()
+	// fmt.Println("MASTER_PASSWORD_KEY:", instance.GetKey())
 
 	return &instance
 }
@@ -185,6 +194,8 @@ func (db *Db) loadManyPasswordEntry(docs []*d.Document) []models.PasswordEntry {
 	for i, doc := range docs {
 		dto := loadPasswordEntryDTO(doc)
 		result[i] = dto.ToPasswordEntry(crypto)
+		// fmt.Println("ENCRYTED_ENTRYPASS:", dto.Password)
+		// fmt.Println("DECRYTED_ENTRYPASS:", result[i].Password)
 	}
 
 	return result
@@ -278,10 +289,11 @@ func (db *Db) ImportDump(password string, dumpFileLocation string) error {
 	}
 
 	mp := models.NewMasterPasswordFromB64(importedDump.Mp)
-	if !mp.Check(password) {
+	if !mp.Check(password, mp.SetClear) {
 		return errors.New("invalid dump password")
 	}
 	cryptoImport := mp.GetCrypto()
+	// fmt.Println("CRYPTO_IMPORT:", cryptoImport.GetKey())
 
 	for _, dto := range importedDump.Pwds {
 		pe := dto.ToPasswordEntry(&cryptoImport)

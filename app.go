@@ -109,7 +109,7 @@ func (a *App) GetMasterPassword() bool {
 func (a *App) CheckMasterPassword(passFromUI string) bool {
 	mp := a.db.RecoverMasterPassword()
 
-	return mp.Check(passFromUI)
+	return mp.Check(passFromUI, a.db.SetMasterPassword)
 }
 
 func (a *App) AddPasswordEntry(website, username, password string) string {

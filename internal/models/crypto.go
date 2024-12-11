@@ -18,6 +18,12 @@ func newCrypto(passkey string) Crypto {
 	return Crypto{key}
 }
 
+/** test method **
+func (c Crypto) GetKey() string {
+	return strings.Trim(string(c.key), "0")
+}
+*/
+
 func (c Crypto) encryptB64(content string) (string, error) {
 	res, err := c.encrypt(content)
 	if err != nil {
