@@ -31,7 +31,7 @@ type Db struct {
 
 type DbDump struct {
 	Mp           string
-	Pwds         []models.PasswordEntry
+	Pwds         []models.PasswordEntryDTO
 	LanguageCode string
 }
 
@@ -128,7 +128,7 @@ func (db *Db) GetCryptoInstance() *models.Crypto {
 
 func (db *Db) InsertPasswordEntry(password models.PasswordEntry) string {
 	// encrypts the password using the current master password as key
-	passDto := password.EncryptPassEntry(db.GetCryptoInstance())
+	passDto := password.ToDTO(db.GetCryptoInstance())
 
 	doc := d.NewDocumentOf(passDto)
 	id, err := db.clover.InsertOne(password_entry_collection, doc)
@@ -174,34 +174,34 @@ func (db *Db) FilterPasswords(search string) []models.PasswordEntry {
 
 func (db *Db) GetPasswordById(id string) models.PasswordEntry {
 	doc, _ := db.clover.FindById(password_entry_collection, id)
-	dto := loadPasswordEntryDto(doc)
+	dto := loadPasswordEntryDTO(doc)
 
-	return dto.DecryptPassEntry(db.GetCryptoInstance())
+	return dto.ToPasswordEntry(db.GetCryptoInstance())
 }
 
 func (db *Db) loadManyPasswordEntry(docs []*d.Document) []models.PasswordEntry {
 	crypto := db.GetCryptoInstance()
 	result := make([]models.PasswordEntry, len(docs))
 	for i, doc := range docs {
-		dto := loadPasswordEntryDto(doc)
-		result[i] = dto.DecryptPassEntry(crypto)
+		dto := loadPasswordEntryDTO(doc)
+		result[i] = dto.ToPasswordEntry(crypto)
 	}
 
 	return result
 }
 
-func loadPasswordEntryDto(doc *d.Document) *models.PasswordEntry {
-	var dto models.PasswordEntry
+func loadPasswordEntryDTO(doc *d.Document) *models.PasswordEntryDTO {
+	var dto models.PasswordEntryDTO
 	doc.Unmarshal(&dto)
 	dto.Id = doc.ObjectId()
 
 	return &dto
 }
 
-func loadManyPasswordEntryDto(docs []*d.Document) []models.PasswordEntry {
-	result := make([]models.PasswordEntry, len(docs))
+func loadManyPasswordEntryDTO(docs []*d.Document) []models.PasswordEntryDTO {
+	result := make([]models.PasswordEntryDTO, len(docs))
 	for i, doc := range docs {
-		result[i] = *loadPasswordEntryDto(doc)
+		result[i] = *loadPasswordEntryDTO(doc)
 	}
 
 	return result
@@ -212,7 +212,7 @@ func (db *Db) DeletePasswordEntry(id string) {
 }
 
 func (db *Db) UpdatePasswordEntry(pe models.PasswordEntry) bool {
-	passDto := pe.EncryptPassEntry(db.GetCryptoInstance())
+	passDto := pe.ToDTO(db.GetCryptoInstance())
 	updates := passDto.ToMap()
 
 	// creating the query when the Id field (whose default name is "_id")
@@ -249,7 +249,7 @@ func (db *Db) GenerateDump(baseFolder string) (string, error) {
 	pwDtosDocs, _ := db.clover.FindAll(
 		query.NewQuery(password_entry_collection),
 	)
-	pwds := loadManyPasswordEntryDto(pwDtosDocs)
+	pwds := loadManyPasswordEntryDTO(pwDtosDocs)
 	lc := db.GetLanguageCode()
 	data := DbDump{
 		mp.Value,
@@ -284,7 +284,7 @@ func (db *Db) ImportDump(password string, dumpFileLocation string) error {
 	cryptoImport := mp.GetCrypto()
 
 	for _, dto := range importedDump.Pwds {
-		pe := dto.DecryptPassEntry(&cryptoImport)
+		pe := dto.ToPasswordEntry(&cryptoImport)
 		db.InsertPasswordEntry(pe)
 	}
 

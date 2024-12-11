@@ -4,8 +4,8 @@ export namespace models {
 	    Id: string;
 	    Website: string;
 	    Username: string;
-	    Timestamp: number;
 	    Password: string;
+	    Timestamp: number;
 	
 	    static createFrom(source: any = {}) {
 	        return new PasswordEntry(source);
@@ -16,8 +16,8 @@ export namespace models {
 	        this.Id = source["Id"];
 	        this.Website = source["Website"];
 	        this.Username = source["Username"];
-	        this.Timestamp = source["Timestamp"];
 	        this.Password = source["Password"];
+	        this.Timestamp = source["Timestamp"];
 	    }
 	}
 
