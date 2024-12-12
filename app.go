@@ -10,8 +10,10 @@ import (
 
 // App struct
 type App struct {
-	ctx context.Context
-	db  *db.Db
+	ctx             context.Context
+	db              *db.Db
+	selectDirectory string
+	selectFile      string
 }
 
 // NewApp creates a new App application struct
@@ -27,9 +29,15 @@ func (a *App) startup(ctx context.Context) {
 	var fileLocation string
 	a.ctx = ctx
 
-	runtime.EventsOn(a.ctx, "change_title", func(optionalData ...interface{}) {
-		if title, ok := optionalData[0].(string); ok {
-			runtime.WindowSetTitle(a.ctx, title)
+	runtime.EventsOn(a.ctx, "change_titles", func(optionalData ...interface{}) {
+		if appTitle, ok := optionalData[0].(string); ok {
+			runtime.WindowSetTitle(a.ctx, appTitle)
+		}
+		if selectDirectory, ok := optionalData[1].(string); ok {
+			a.selectDirectory = selectDirectory
+		}
+		if selectFile, ok := optionalData[2].(string); ok {
+			a.selectFile = selectFile
 		}
 	})
 
@@ -38,7 +46,10 @@ func (a *App) startup(ctx context.Context) {
 	})
 
 	runtime.EventsOn(a.ctx, "export_data", func(optionalData ...interface{}) {
-		d, _ := runtime.OpenDirectoryDialog(a.ctx, runtime.OpenDialogOptions{Title: "Select the directory where to save the data export"})
+		d, _ := runtime.OpenDirectoryDialog(a.ctx, runtime.
+			OpenDialogOptions{
+			Title: a.selectDirectory,
+		})
 
 		if d != "" {
 			f, err := a.db.GenerateDump(d)
@@ -50,7 +61,7 @@ func (a *App) startup(ctx context.Context) {
 
 	runtime.EventsOn(a.ctx, "import_data", func(optionalData ...interface{}) {
 		fileLocation, _ = runtime.OpenFileDialog(a.ctx, runtime.OpenDialogOptions{
-			Title: "Select the backup file to import",
+			Title: a.selectFile,
 		})
 
 		// fmt.Println("SELECTED FILE:", fileLocation)

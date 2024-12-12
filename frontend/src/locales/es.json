@@ -1,6 +1,8 @@
 {
     "language": "Idioma",
     "app_title": "Nu-i uita • almacén de contraseñas minimalista",
+    "select_directory": "Selecciona el directorio donde guardar los datos exportados",
+    "select_file": "Selecciona el archivo de respaldo que deseas importar",
     "master_password": "Contraseña Maestra 👇",
     "generate": "Generar",
     "insert": "Insertar",

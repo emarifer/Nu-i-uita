@@ -22,13 +22,6 @@
         "/settings": Settings,
     };
 
-    // onMount(() => {
-    //     GetLanguage().then((result) => {
-    //         locale.set(result);
-    //         EventsEmit("change_title", `${$_("app_title")}`);
-    //     });
-    // });
-
     const onKeyDown = (e: KeyboardEvent) =>
         e.key === "Escape" ? EventsEmit("quit") : false;
 </script>

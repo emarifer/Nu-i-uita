@@ -22,7 +22,12 @@
     const handleChange = (newLocale: language) => {
         // console.log("Language selected:", newLocale);
         locale.set(newLocale["code"]);
-        EventsEmit("change_title", `${$_("app_title")}`);
+        EventsEmit(
+            "change_titles",
+            $_("app_title"),
+            $_("select_directory"),
+            $_("select_file"),
+        );
         SaveLanguage(newLocale["code"]);
     };
 </script>

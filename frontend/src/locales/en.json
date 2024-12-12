@@ -1,6 +1,8 @@
 {
     "language": "Language",
     "app_title": "Nu-i uita • minimalist password store",
+    "select_directory": "Select the directory where to save the data export",
+    "select_file": "Select the backup file to import",
     "master_password": "Master Password 👇",
     "generate": "Generate",
     "insert": "Insert",

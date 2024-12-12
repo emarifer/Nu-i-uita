@@ -31,7 +31,12 @@
 
         GetLanguage().then((result) => {
             locale.set(result);
-            EventsEmit("change_title", `${$_("app_title")}`);
+            EventsEmit(
+                "change_titles",
+                $_("app_title"),
+                $_("select_directory"),
+                $_("select_file"),
+            );
         });
 
         return () => {
