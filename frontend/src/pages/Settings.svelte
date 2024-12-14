@@ -14,25 +14,54 @@
     onMount(() => {
         mounted = true;
 
-        EventsOn("saved_as", (file: string) => {
-            Swal.fire({
-                title: `${$_("saved_as")} ${file}`,
-                width: 275,
-                icon: "success",
-                iconHtml: `
-                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" viewBox="0 0 16 16">
-                    <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
-                </svg>
-                `,
-                background: "#1D232A",
-                color: "#A6ADBA",
-                confirmButtonColor: "#3085d6",
-                customClass: {
-                    title: "alertTitle",
-                    confirmButton: "alertConfirm",
-                    icon: "alertIcon",
-                },
-            });
+        EventsOn("saved_as", (result: string) => {
+            if (result.includes("error")) {
+                Swal.fire({
+                    title: result,
+                    width: 275,
+                    icon: "error",
+                    iconHtml: `
+                    <svg height="32" style="overflow:visible;enable-background:new 0 0 32 32" viewBox="0 0 32 32" width="32"
+                        xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                        <g>
+                            <g id="Error_1_">
+                                <g id="Error">
+                                    <circle cx="16" cy="16" id="BG" r="16" style="fill:#D72828;" />
+                                    <path d="M14.5,25h3v-3h-3V25z M14.5,6v13h3V6H14.5z" id="Exclamatory_x5F_Sign" style="fill:#E6E6E6;" />
+                                </g>
+                            </g>
+                        </g>
+                    </svg>
+                    `,
+                    background: "#1D232A",
+                    color: "#A6ADBA",
+                    confirmButtonColor: "#3085d6",
+                    customClass: {
+                        title: "errorTitle",
+                        confirmButton: "alertConfirm",
+                        icon: "alertIcon",
+                    },
+                });
+            } else {
+                Swal.fire({
+                    title: `${$_("saved_as")} ${result}`,
+                    width: 275,
+                    icon: "success",
+                    iconHtml: `
+                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+                    </svg>
+                    `,
+                    background: "#1D232A",
+                    color: "#A6ADBA",
+                    confirmButtonColor: "#3085d6",
+                    customClass: {
+                        title: "alertTitle",
+                        confirmButton: "alertConfirm",
+                        icon: "alertIcon",
+                    },
+                });
+            }
         });
 
         EventsOn("enter_password", async () => {

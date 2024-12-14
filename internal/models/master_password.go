@@ -35,11 +35,6 @@ func (m *MasterPassword) SetClear(clear string) {
 	m.clear = clear
 }
 
-/* func (m *MasterPassword) GetClear() string {
-
-	return m.clear
-} */
-
 func (m *MasterPassword) Check(value string, cb func(v string)) bool {
 	c := newCrypto(value)
 

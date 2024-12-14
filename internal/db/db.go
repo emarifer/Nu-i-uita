@@ -26,7 +26,8 @@ const (
 )
 
 type Db struct {
-	clover *c.DB
+	clover   *c.DB
+	cachedMp *models.MasterPassword
 }
 
 type DbDump struct {
@@ -34,8 +35,6 @@ type DbDump struct {
 	Pwds         []models.PasswordEntryDTO
 	LanguageCode string
 }
-
-var clear string
 
 func setupCollections(db *c.DB) {
 	db.CreateCollection(language_collection)
@@ -91,13 +90,14 @@ func (db *Db) SaveLanguageCode(code string) {
 }
 
 func (db *Db) InsertMasterPassword(mpStr string) string {
-	clear = mpStr
 	mp := models.NewMasterPassword(mpStr)
 	doc := d.NewDocumentOf(mp)
 	id, err := db.clover.InsertOne(master_password_collection, doc)
 	if err != nil {
 		panic(err)
 	}
+	mp.SetClear(mpStr)
+	db.cachedMp = &mp
 
 	return id
 }
@@ -118,18 +118,24 @@ func (db *Db) RecoverMasterPassword() models.MasterPassword {
 	if err != nil {
 		panic(err)
 	}
+	if mp.Value != "" {
+		db.cachedMp = &mp
+	}
 
 	return mp
 }
 
 func (db *Db) SetMasterPassword(v string) {
-	clear = v
+	if db.cachedMp != nil {
+		db.cachedMp.SetClear(v)
+	}
 }
 
-func (db *Db) GetCryptoInstance() *models.Crypto {
-	mp := db.RecoverMasterPassword()
-	mp.SetClear(clear)
-	instance := mp.GetCrypto()
+func (db *Db) getCryptoInstance() *models.Crypto {
+	if db.cachedMp == nil {
+		panic("crypto instance is nil")
+	}
+	instance := db.cachedMp.GetCrypto()
 	// fmt.Println("MASTER_PASSWORD_KEY:", instance.GetKey())
 
 	return &instance
@@ -137,7 +143,7 @@ func (db *Db) GetCryptoInstance() *models.Crypto {
 
 func (db *Db) InsertPasswordEntry(password models.PasswordEntry) string {
 	// encrypts the password using the current master password as key
-	passDto := password.ToDTO(db.GetCryptoInstance())
+	passDto := password.ToDTO(db.getCryptoInstance())
 
 	doc := d.NewDocumentOf(passDto)
 	id, err := db.clover.InsertOne(password_entry_collection, doc)
@@ -185,11 +191,11 @@ func (db *Db) GetPasswordById(id string) models.PasswordEntry {
 	doc, _ := db.clover.FindById(password_entry_collection, id)
 	dto := loadPasswordEntryDTO(doc)
 
-	return dto.ToPasswordEntry(db.GetCryptoInstance())
+	return dto.ToPasswordEntry(db.getCryptoInstance())
 }
 
 func (db *Db) loadManyPasswordEntry(docs []*d.Document) []models.PasswordEntry {
-	crypto := db.GetCryptoInstance()
+	crypto := db.getCryptoInstance()
 	result := make([]models.PasswordEntry, len(docs))
 	for i, doc := range docs {
 		dto := loadPasswordEntryDTO(doc)
@@ -223,7 +229,7 @@ func (db *Db) DeletePasswordEntry(id string) {
 }
 
 func (db *Db) UpdatePasswordEntry(pe models.PasswordEntry) bool {
-	passDto := pe.ToDTO(db.GetCryptoInstance())
+	passDto := pe.ToDTO(db.getCryptoInstance())
 	updates := passDto.ToMap()
 
 	// creating the query when the Id field (whose default name is "_id")
@@ -242,6 +248,7 @@ func (db *Db) DropCollections() {
 	db.clover.DropCollection(language_collection)
 	db.clover.DropCollection(password_entry_collection)
 	db.clover.DropCollection(master_password_collection)
+	db.cachedMp = nil // cache clearing
 
 	// this is to avoid fatal errors in case of drop then continuing
 	setupCollections(db.clover)
@@ -252,26 +259,31 @@ func (db *Db) GenerateDump(baseFolder string) (string, error) {
 	fileName := filepath.Join(baseFolder, fmt.Sprintf("pwds_%s.%s", dumpDate, dump_file_extension))
 	f, err := os.Create(fileName)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("error: %s", err)
 	}
 	defer f.Close()
 
-	mp := db.RecoverMasterPassword()
+	if db.cachedMp == nil {
+		return "", errors.New("error: master password cache is nil")
+	}
+
 	pwDtosDocs, _ := db.clover.FindAll(
 		query.NewQuery(password_entry_collection),
 	)
 	pwds := loadManyPasswordEntryDTO(pwDtosDocs)
 	lc := db.GetLanguageCode()
 	data := DbDump{
-		mp.Value,
+		db.cachedMp.Value,
 		pwds,
 		lc,
 	}
 
 	encoder := gob.NewEncoder(f)
-	errEncoding := encoder.Encode(data)
+	if encoder.Encode(data) != nil {
+		return "", fmt.Errorf("error: %s", encoder.Encode(data))
+	}
 
-	return fileName, errEncoding
+	return fileName, nil
 }
 
 func (db *Db) ImportDump(password string, dumpFileLocation string) error {
