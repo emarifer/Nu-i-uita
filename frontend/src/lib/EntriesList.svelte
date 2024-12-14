@@ -93,7 +93,9 @@
 </script>
 
 {#if search}
-    <h1 class="font-light absolute top-14 right-0 left-0">Search Result:</h1>
+    <h1 class="font-light absolute top-14 right-0 left-0">
+        {$_("search_result")}
+    </h1>
 {/if}
 {#if entries.length}
     <ul

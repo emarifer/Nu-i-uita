@@ -27,6 +27,7 @@
     "password_placeholder": "Contraseña",
     "create_entry": "Crear Entrada",
     "no_empty_fields": "¡Ninguno de los campos puede estar vacío!",
+    "search_result": "Resultado de la Búsqueda:",
     "details_btn_tip": "Detalles",
     "delete_btn_tip": "Eliminar",
     "alert_deleting_password": "Eliminar contraseña de",
