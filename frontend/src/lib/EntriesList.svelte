@@ -7,8 +7,8 @@
     } from "../../wailsjs/go/main/App";
     import { onDestroy, onMount } from "svelte";
     import { _ } from "svelte-i18n";
-    import Swal from "sweetalert2";
     import { push } from "svelte-spa-router";
+    import { showSuccess, showWarning } from "./popups/popups";
 
     let {
         listCounter = $bindable(),
@@ -38,51 +38,18 @@
 
     onDestroy(() => (search = ""));
 
-    const showAlert = (website: string, id: string) =>
-        Swal.fire({
-            title: `${$_("alert_deleting_password")} "${website}."`,
-            width: 275,
-            icon: "warning",
-            iconHtml: `
-            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" viewBox="0 0 16 16">
-                <path d="M11.46.146A.5.5 0 0 0 11.107 0H4.893a.5.5 0 0 0-.353.146L.146 4.54A.5.5 0 0 0 0 4.893v6.214a.5.5 0 0 0 .146.353l4.394 4.394a.5.5 0 0 0 .353.146h6.214a.5.5 0 0 0 .353-.146l4.394-4.394a.5.5 0 0 0 .146-.353V4.893a.5.5 0 0 0-.146-.353zM8 4c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 4.995A.905.905 0 0 1 8 4m.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2"/>
-            </svg>
-            `,
-            background: "#1D232A",
-            color: "#A6ADBA",
-            showCancelButton: true,
-            confirmButtonColor: "#3085d6",
-            cancelButtonColor: "#d33",
-            confirmButtonText: `${$_("alert_confirm_deleting")}`,
-            customClass: {
-                title: "alertTitle",
-                confirmButton: "alertConfirm",
-                cancelButton: "alertCancel",
-                icon: "alertIcon",
-            },
-        }).then((result) => {
+    const showAlert = (website: string, id: string) => {
+        const data: string[] = [
+            `${$_("alert_deleting_password")} "${website}."`,
+            `${$_("alert_confirm_deleting")}`,
+        ];
+        showWarning(data).then((result) => {
             if (result.value) {
                 DeleteEntry(id).then(() => deleteItem(id));
-                Swal.fire({
-                    title: `${$_("deletion_confirm_msg")}`,
-                    width: 275,
-                    icon: "success",
-                    iconHtml: `
-                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" viewBox="0 0 16 16">
-                        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
-                    </svg>
-                    `,
-                    background: "#1D232A",
-                    color: "#A6ADBA",
-                    confirmButtonColor: "#3085d6",
-                    customClass: {
-                        title: "alertTitle",
-                        confirmButton: "alertConfirm",
-                        icon: "alertIcon",
-                    },
-                });
+                showSuccess($_("deletion_confirm_msg"));
             }
         });
+    };
 
     const deleteItem = (id: string): void => {
         let itemIdx = entries.findIndex((x) => x.Id === id);
