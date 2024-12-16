@@ -28,6 +28,7 @@
     "create_entry": "Create Entry",
     "no_empty_fields": "None of the fields can be empty !!",
     "search_result": "Search Result:",
+    "no_password_entries": "No Password Entries…",
     "details_btn_tip": "Details",
     "delete_btn_tip": "Delete",
     "alert_deleting_password": "Deleting password for",

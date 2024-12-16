@@ -22,6 +22,10 @@
 
 <img src="doc/screenshot-01.gif" width="45%">
 
+<br />
+
+<br />
+
 </div>
 
 - [x] **Using the [Wails](https://wails.io/) GUI framework:** `Wails` is a framework  that enables you to write desktop apps using Go and web technologies. This in itself allows you to immediately apply all your acquired knowledge if you come from the Web world, that's why we can consider it a lightweight and fast Electron alternative for Go. You can easily build applications with the flexibility and power of Go, combined with a rich, modern frontend. Wails supports cross-compilation for various platforms, native menus, dialogs and theming, use of various JavaScript frameworks for building the frontend, live development mode using the power of Vite, and a powerful CLI to easily create, build, and package applications, among many other [features](https://wails.io/docs/introduction#features).

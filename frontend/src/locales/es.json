@@ -28,6 +28,7 @@
     "create_entry": "Crear Entrada",
     "no_empty_fields": "¡Ninguno de los campos puede estar vacío!",
     "search_result": "Resultado de la Búsqueda:",
+    "no_password_entries": "No hay Entradas de Contraseña…",
     "details_btn_tip": "Detalles",
     "delete_btn_tip": "Eliminar",
     "alert_deleting_password": "Eliminar contraseña de",
