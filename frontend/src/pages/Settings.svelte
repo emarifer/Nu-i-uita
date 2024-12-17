@@ -19,13 +19,13 @@
     onMount(() => {
         mounted = true;
 
-        EventsOn("saved_as", (result: string) => {
+        const cancelSavedAs = EventsOn("saved_as", (result: string) => {
             result.includes("error")
                 ? showError(result)
                 : showSuccess(`${$_("saved_as")} ${result}`);
         });
 
-        EventsOn("enter_password", async () => {
+        const cancelEnterPassword = EventsOn("enter_password", async () => {
             const { value: password } = await showQuestion(
                 $_("enter_password"),
             );
@@ -34,7 +34,7 @@
             }
         });
 
-        EventsOn("imported_data", (res: string) => {
+        const cancelImportedData = EventsOn("imported_data", (res: string) => {
             // console.log(res);
             if (res === "success") {
                 GetLanguage().then((result) => {
@@ -56,6 +56,14 @@
                 showError(res);
             }
         });
+
+        // canceling listeners
+        return () => {
+            cancelSavedAs();
+            cancelEnterPassword();
+            cancelImportedData();
+            // console.log("CANCELING LISTENERS");
+        };
     });
 
     const showAlert = () => {
